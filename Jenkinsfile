@@ -65,5 +65,19 @@ pipeline{
                 sh "trivy image gopivurata/2048:latest > trivy.txt" 
             }
         }
+      stage('Deploy to container'){
+            steps{
+                sh 'docker container run -d --name 2048 -p 3000:3000 gopivurata/2048:latest'
+            }
+        }
+      stage('Deploy to kubernets'){
+            steps{
+                script{
+                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                       sh 'kubectl apply -f deployment.yaml'
+                  }
+                }
+            }
+        }
     }
 }
